@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+
+        body {
+            text-align: center;
+            transition: background 0.5s ease-in-out;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            width: 350px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        h1 {
+            font-size: 26px;
+            margin-bottom: 15px;
+            color: white;
+            font-weight: bold; 
+            
+        }
+
+        input {
+            width: 85%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 16px;
+            outline: none;
+        }
+
+        button {
+            background: #ff5f6d;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #ff9966;
+        }
+
+        .weather-box {
+            margin-top: 20px;
+            color: white;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        img {
+            width: 100px;
+            margin-top: 10px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .weather-box h2 {
+            font-size: 22px;
+            margin: 10px 0;
+        }
+
+        .weather-details {
+            font-size: 18px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌎 Live Weather</h1>
+        <input type="text" id="cityInput" placeholder="Enter city name">
+        <button onclick="getWeather()">Get Weather</button>
+        
+        <div id="weatherInfo" class="weather-box">
+            <h2 id="location"></h2>
+            <img id="icon" src="" alt="Weather Icon">
+            <p id="temperature" class="weather-details"></p>
+            <p id="condition" class="weather-details"></p>
+            <p id="humidity" class="weather-details"></p>
+            <p id="wind" class="weather-details"></p>
+        </div>
+    </div>
+
+    <script>
+        function getWeather() {
+            const city = document.getElementById("cityInput").value;
+            if (city === "") {
+                alert("Please enter a city name.");
+                return;
+            }
+
+            const apiKey = "eca34ef9c2684e07b46171937250702";
+            const url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}&aqi=no`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("weatherInfo").style.display = "block";
+                    document.getElementById("weatherInfo").style.opacity = "1";
+
+                    document.getElementById("location").innerText = `${data.location.name}, ${data.location.country}`;
+                    document.getElementById("icon").src = data.current.condition.icon;
+                    document.getElementById("temperature").innerText = `🌡️ Temperature: ${data.current.temp_c}°C`;
+                    document.getElementById("condition").innerText = `🌥️ Condition: ${data.current.condition.text}`;
+                    document.getElementById("humidity").innerText = `💧 Humidity: ${data.current.humidity}%`;
+                    document.getElementById("wind").innerText = `💨 Wind: ${data.current.wind_kph} km/h`;
+
+                    changeBackground(data.current.temp_c);
+                })
+                .catch(error => {
+                    alert("City not found! Please enter a valid city.");
+                    console.error("Error fetching weather:", error);
+                });
+        }
+
+        function changeBackground(temp) {
+            let bgColor;
+            if (temp <= 10) {
+                bgColor = "linear-gradient(to right, #4facfe, #00f2fe)";
+            } else if (temp > 10 && temp <= 25) {
+                bgColor = "linear-gradient(to right, #4facfe, #34e89e)";
+            } else {
+                bgColor = "linear-gradient(to right, #ff9966, #ff5e62)";
+            }
+            document.body.style.background = bgColor;
+        }
+    </script>
+</body>
+</html>
